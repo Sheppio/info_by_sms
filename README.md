@@ -48,6 +48,20 @@ The site also supports a build-time version file. Run `./build-version.sh` befor
 
 Then open `http://localhost:8000/location-share.html`.
 
+### Git hooks (optional, recommended)
+
+To have Git run `build-version.sh` on every commit (so `version.js` stays up-to-date), enable the repository-local hooks and make the pre-commit hook executable:
+
+```bash
+git config core.hooksPath .githooks
+chmod +x .githooks/pre-commit
+./build-version.sh
+```
+
+After this, committing will run the build script automatically.
+
+By default the pre-commit hook will stage `version.js` when it changes so the generated build file is included in the commit. The hook will not modify your commit message.
+
 ## License
 
 No license specified.

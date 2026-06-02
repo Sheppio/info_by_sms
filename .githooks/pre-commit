@@ -1,0 +1,25 @@
+#!/usr/bin/env sh
+set -eu
+
+# Run the build-version script to update version.js before committing
+if [ -x "./build-version.sh" ]; then
+  ./build-version.sh
+else
+  sh ./build-version.sh
+fi
+
+# Run the build-version script to update version.js before committing
+if [ -x "./build-version.sh" ]; then
+  ./build-version.sh
+else
+  sh ./build-version.sh
+fi
+
+# If version.js changed, stage it so the commit includes the updated file
+if [ -n "$(git status --porcelain -- version.js)" ]; then
+  git add version.js
+fi
+
+# Note: this hook stages `version.js` but does NOT modify the commit message.
+
+exit 0
