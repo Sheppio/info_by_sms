@@ -63,6 +63,7 @@ People often need to share their current location quickly, especially when they 
 - FR6: The app must open `sms:<phone>?body=<message>` when sending.
 - FR7: The app must cache the app shell assets in `sw.js` during service worker install.
 - FR8: The app must remember the last entered phone number between sessions using browser storage.
+- FR9: The app must display a build version on the site that updates with each commit.
 
 ## Non-Functional Requirements
 

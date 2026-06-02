@@ -10,6 +10,7 @@ A lightweight progressive web app that lets a user capture their current locatio
 - Opens the SMS composer with a ready-to-send message.
 - Remembers the last phone number entered across browser sessions.
 - Uses a service worker to cache the app shell for offline availability.
+- Displays a build version based on the commit count.
 
 ## Files
 
@@ -42,6 +43,8 @@ Use any static server. For example:
 ```bash
 python3 -m http.server 8000
 ```
+
+The site also supports a build-time version file. Run `./build-version.sh` before deploying to generate `version.js`.
 
 Then open `http://localhost:8000/location-share.html`.
 

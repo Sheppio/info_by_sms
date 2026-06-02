@@ -154,6 +154,13 @@
       text-align: center;
       margin-top: 8px;
     }
+
+    .version {
+      text-align: center;
+      color: #a0aec0;
+      font-size: 0.75rem;
+      margin-top: 2px;
+    }
   </style>
 </head>
 <body>
@@ -176,8 +183,10 @@
       Send Location via SMS
     </button>
     <p class="note">Opens your SMS app with the message pre-filled</p>
+    <div class="version" id="version-text">Version build-0 (dev)</div>
   </div>
 
+  <script src="./version.js"></script>
   <script>
     const PHONE_STORAGE_KEY = 'lastPhoneNumber';
     let coords = null;
@@ -254,7 +263,17 @@
       window.location.href = `sms:${phone}?body=${message}`;
     }
 
-    window.addEventListener('DOMContentLoaded', initPhonePersistence);
+    function updateVersionText() {
+      const versionElement = document.getElementById('version-text');
+      if (typeof BUILD_VERSION !== 'undefined') {
+        versionElement.textContent = `Version ${BUILD_VERSION}`;
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initPhonePersistence();
+      updateVersionText();
+    });
   </script>
   <script>
     if ('serviceWorker' in navigator) {
