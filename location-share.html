@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Share My Location</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#3b82f6" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="My Location" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 36px 32px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+    }
+
+    .icon {
+      font-size: 48px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      color: #1a202c;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #718096;
+      font-size: 0.9rem;
+      margin-bottom: 28px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 6px;
+    }
+
+    input[type="tel"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 16px;
+    }
+
+    input[type="tel"]:focus {
+      border-color: #4f9cf9;
+    }
+
+    .location-box {
+      background: #f7fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .location-box .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #cbd5e0;
+      flex-shrink: 0;
+    }
+
+    .location-box .dot.ready { background: #48bb78; }
+    .location-box .dot.error { background: #f56565; }
+    .location-box .dot.loading {
+      background: #4f9cf9;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .location-text {
+      font-size: 0.88rem;
+      color: #4a5568;
+      line-height: 1.4;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 10px;
+    }
+
+    .btn-locate {
+      background: #edf2f7;
+      color: #4a5568;
+    }
+
+    .btn-locate:hover { background: #e2e8f0; }
+
+    .btn-send {
+      background: linear-gradient(135deg, #4f9cf9, #3b82f6);
+      color: white;
+    }
+
+    .btn-send:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .btn-send:active { transform: translateY(0); }
+    .btn-send:disabled {
+      background: #cbd5e0;
+      color: #a0aec0;
+      cursor: not-allowed;
+      transform: none;
+      filter: none;
+    }
+
+    .note {
+      font-size: 0.78rem;
+      color: #a0aec0;
+      text-align: center;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">📍</div>
+    <h1>Share My Location</h1>
+    <p class="subtitle">Send your current location as a Google Maps link via SMS</p>
+
+    <label for="phone">Recipient's phone number</label>
+    <input type="tel" id="phone" placeholder="+1 555 000 0000" />
+
+    <label>Your location</label>
+    <div class="location-box">
+      <div class="dot" id="dot"></div>
+      <div class="location-text" id="location-text">Tap "Get My Location" to start</div>
+    </div>
+
+    <button class="btn btn-locate" onclick="getLocation()">📡 Get My Location</button>
+    <button class="btn btn-send" id="send-btn" disabled onclick="sendSMS()">
+      Send Location via SMS
+    </button>
+    <p class="note">Opens your SMS app with the message pre-filled</p>
+  </div>
+
+  <script>
+    let coords = null;
+
+    function getLocation() {
+      const dot = document.getElementById('dot');
+      const text = document.getElementById('location-text');
+
+      dot.className = 'dot loading';
+      text.textContent = 'Finding your location…';
+
+      if (!navigator.geolocation) {
+        dot.className = 'dot error';
+        text.textContent = 'Geolocation is not supported by this browser.';
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          const accuracy = Math.round(pos.coords.accuracy);
+          dot.className = 'dot ready';
+          text.textContent = `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}  (±${accuracy}m accuracy)`;
+          document.getElementById('send-btn').disabled = false;
+        },
+        (err) => {
+          dot.className = 'dot error';
+          const messages = {
+            1: 'Permission denied. Please allow location access and try again.',
+            2: 'Location unavailable. Try again or move to a better spot.',
+            3: 'Request timed out. Please try again.',
+          };
+          text.textContent = messages[err.code] || 'Could not get location.';
+        },
+        { enableHighAccuracy: true, timeout: 15000 }
+      );
+    }
+
+    function sendSMS() {
+      const phone = document.getElementById('phone').value.trim().replace(/\s+/g, '');
+
+      if (!phone) {
+        alert('Please enter a phone number first.');
+        return;
+      }
+
+      if (!coords) {
+        alert('Please get your location first.');
+        return;
+      }
+
+      const mapsLink = `https://maps.google.com/?q=${coords.lat},${coords.lng}`;
+      const message = encodeURIComponent(`Here's my current location: ${mapsLink}`);
+
+      // sms: URI — opens native SMS app with number and body pre-filled
+      window.location.href = `sms:${phone}?body=${message}`;
+    }
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
+    }
+  </script>
+</body>
+</html>
