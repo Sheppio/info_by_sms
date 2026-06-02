@@ -8,6 +8,7 @@ A lightweight progressive web app that lets a user capture their current locatio
 - Shows latitude, longitude, and accuracy.
 - Accepts a recipient phone number.
 - Opens the SMS composer with a ready-to-send message.
+- Remembers the last phone number entered across browser sessions.
 - Uses a service worker to cache the app shell for offline availability.
 
 ## Files

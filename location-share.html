@@ -179,7 +179,26 @@
   </div>
 
   <script>
+    const PHONE_STORAGE_KEY = 'lastPhoneNumber';
     let coords = null;
+
+    function initPhonePersistence() {
+      const phoneInput = document.getElementById('phone');
+      const savedPhone = localStorage.getItem(PHONE_STORAGE_KEY);
+
+      if (savedPhone) {
+        phoneInput.value = savedPhone;
+      }
+
+      phoneInput.addEventListener('input', () => {
+        const value = phoneInput.value.trim();
+        if (value) {
+          localStorage.setItem(PHONE_STORAGE_KEY, value);
+        } else {
+          localStorage.removeItem(PHONE_STORAGE_KEY);
+        }
+      });
+    }
 
     function getLocation() {
       const dot = document.getElementById('dot');
@@ -234,6 +253,8 @@
       // sms: URI — opens native SMS app with number and body pre-filled
       window.location.href = `sms:${phone}?body=${message}`;
     }
+
+    window.addEventListener('DOMContentLoaded', initPhonePersistence);
   </script>
   <script>
     if ('serviceWorker' in navigator) {

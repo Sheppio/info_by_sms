@@ -62,6 +62,7 @@ People often need to share their current location quickly, especially when they 
 - FR5: The app must generate a Google Maps URL with latitude and longitude.
 - FR6: The app must open `sms:<phone>?body=<message>` when sending.
 - FR7: The app must cache the app shell assets in `sw.js` during service worker install.
+- FR8: The app must remember the last entered phone number between sessions using browser storage.
 
 ## Non-Functional Requirements
 
