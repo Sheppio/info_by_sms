@@ -114,6 +114,13 @@
       line-height: 1.4;
     }
 
+    .tracking-status {
+      font-size: 0.78rem;
+      color: #718096;
+      margin-top: 8px;
+      text-align: center;
+    }
+
     .btn {
       width: 100%;
       padding: 14px;
@@ -177,6 +184,7 @@
       <div class="dot" id="dot"></div>
       <div class="location-text" id="location-text">Tap "Get My Location" to start</div>
     </div>
+    <p class="tracking-status" id="tracking-status">Location updates are paused until you tap "Get My Location".</p>
 
     <button class="btn btn-locate" onclick="getLocation()">📡 Get My Location</button>
     <button class="btn btn-send" id="send-btn" disabled onclick="sendSMS()">
@@ -190,6 +198,7 @@
   <script>
     const PHONE_STORAGE_KEY = 'lastPhoneNumber';
     let coords = null;
+    let watchId = null;
 
     function initPhonePersistence() {
       const phoneInput = document.getElementById('phone');
@@ -209,37 +218,65 @@
       });
     }
 
+    function updateLocationText(pos) {
+      const dot = document.getElementById('dot');
+      const text = document.getElementById('location-text');
+      coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      const accuracy = Math.round(pos.coords.accuracy);
+      dot.className = 'dot ready';
+      text.textContent = `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}  (±${accuracy}m accuracy)`;
+      document.getElementById('send-btn').disabled = false;
+    }
+
+    function handleLocationError(err) {
+      const dot = document.getElementById('dot');
+      const text = document.getElementById('location-text');
+      dot.className = 'dot error';
+      const messages = {
+        1: 'Permission denied. Please allow location access and try again.',
+        2: 'Location unavailable. Try again or move to a better spot.',
+        3: 'Request timed out. Please try again.',
+      };
+      text.textContent = messages[err.code] || 'Could not get location.';
+    }
+
+    function stopLocationWatch() {
+      if (watchId !== null && navigator.geolocation) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+      }
+      const trackingStatus = document.getElementById('tracking-status');
+      trackingStatus.textContent = 'Location updates are paused until you tap "Get My Location".';
+    }
+
     function getLocation() {
       const dot = document.getElementById('dot');
       const text = document.getElementById('location-text');
+      const trackingStatus = document.getElementById('tracking-status');
 
       dot.className = 'dot loading';
-      text.textContent = 'Finding your location…';
+      text.textContent = 'Tracking your location…';
+      trackingStatus.textContent = 'Tracking location updates until you send the message.';
 
       if (!navigator.geolocation) {
         dot.className = 'dot error';
         text.textContent = 'Geolocation is not supported by this browser.';
+        trackingStatus.textContent = 'Location tracking is unavailable.';
         return;
       }
 
-      navigator.geolocation.getCurrentPosition(
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+
+      watchId = navigator.geolocation.watchPosition(
         (pos) => {
-          coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          const accuracy = Math.round(pos.coords.accuracy);
-          dot.className = 'dot ready';
-          text.textContent = `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}  (±${accuracy}m accuracy)`;
-          document.getElementById('send-btn').disabled = false;
+          updateLocationText(pos);
         },
         (err) => {
-          dot.className = 'dot error';
-          const messages = {
-            1: 'Permission denied. Please allow location access and try again.',
-            2: 'Location unavailable. Try again or move to a better spot.',
-            3: 'Request timed out. Please try again.',
-          };
-          text.textContent = messages[err.code] || 'Could not get location.';
+          handleLocationError(err);
         },
-        { enableHighAccuracy: true, timeout: 15000 }
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
       );
     }
 
@@ -255,6 +292,8 @@
         alert('Please get your location first.');
         return;
       }
+
+      stopLocationWatch();
 
       const mapsLink = `https://maps.google.com/?q=${coords.lat},${coords.lng}`;
       const message = encodeURIComponent(`Here's my current location: ${mapsLink}`);

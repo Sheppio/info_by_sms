@@ -5,6 +5,7 @@ A lightweight progressive web app that lets a user capture their current locatio
 ## What it does
 
 - Retrieves the user's current GPS location using browser geolocation.
+- Continues tracking location updates until the user sends the SMS so the latest coordinates are used.
 - Shows latitude, longitude, and accuracy.
 - Accepts a recipient phone number.
 - Opens the SMS composer with a ready-to-send message.
@@ -47,6 +48,10 @@ python3 -m http.server 8000
 The site also supports a build-time version file. Run `./build-version.sh` before deploying to generate `version.js`.
 
 Then open `http://localhost:8000/location-share.html`.
+
+## Debugging in VS Code
+
+This repo includes a VS Code Chrome launch configuration. Start the `Launch Chrome with location-share` debug target to launch Chrome at `http://localhost:8000/location-share.html` and automatically start a local server.
 
 ### Git hooks (optional, recommended)
 
