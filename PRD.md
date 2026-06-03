@@ -65,6 +65,7 @@ People often need to share their current location quickly, especially when they 
 - FR8: The app must remember the last entered phone number between sessions using browser storage.
 - FR9: The app must keep the captured location up to date while the user is ready to send, so the SMS uses the most recent coordinates.
 - FR10: The app must display a build version on the site that updates with each commit.
+- FR11: The app must include a timestamp with timezone and GPS accuracy in the SMS message to indicate when the location was captured and how precise it is.
 
 ## Non-Functional Requirements
 

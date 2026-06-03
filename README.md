@@ -8,7 +8,7 @@ A lightweight progressive web app that lets a user capture their current locatio
 - Continues tracking location updates until the user sends the SMS so the latest coordinates are used.
 - Shows latitude, longitude, and accuracy.
 - Accepts a recipient phone number.
-- Opens the SMS composer with a ready-to-send message.
+- Opens the SMS composer with a message that includes a timestamp with timezone and GPS accuracy.
 - Remembers the last phone number entered across browser sessions.
 - Uses a service worker to cache the app shell for offline availability.
 - Displays a build version based on the commit count.

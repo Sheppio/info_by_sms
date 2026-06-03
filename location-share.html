@@ -198,6 +198,7 @@
   <script>
     const PHONE_STORAGE_KEY = 'lastPhoneNumber';
     let coords = null;
+    let accuracy = null;
     let watchId = null;
 
     function initPhonePersistence() {
@@ -222,7 +223,7 @@
       const dot = document.getElementById('dot');
       const text = document.getElementById('location-text');
       coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-      const accuracy = Math.round(pos.coords.accuracy);
+      accuracy = Math.round(pos.coords.accuracy);
       dot.className = 'dot ready';
       text.textContent = `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}  (±${accuracy}m accuracy)`;
       document.getElementById('send-btn').disabled = false;
@@ -296,7 +297,8 @@
       stopLocationWatch();
 
       const mapsLink = `https://maps.google.com/?q=${coords.lat},${coords.lng}`;
-      const message = encodeURIComponent(`Here's my current location: ${mapsLink}`);
+      const timestamp = new Date().toLocaleString('en-US', { timeZoneName: 'short', hour12: false });
+      const message = encodeURIComponent(`Here's my current location as of ${timestamp} (±${accuracy}m accuracy): ${mapsLink}`);
 
       // sms: URI — opens native SMS app with number and body pre-filled
       window.location.href = `sms:${phone}?body=${message}`;
