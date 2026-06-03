@@ -297,7 +297,7 @@
       stopLocationWatch();
 
       const mapsLink = `https://maps.google.com/?q=${coords.lat},${coords.lng}`;
-      const timestamp = new Date().toLocaleString('en-US', { timeZoneName: 'short', hour12: false });
+      const timestamp = new Date().toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short', hour12: false });
       const message = encodeURIComponent(`Here's my current location as of ${timestamp} (±${accuracy}m accuracy): ${mapsLink}`);
 
       // sms: URI — opens native SMS app with number and body pre-filled
